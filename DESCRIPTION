@@ -1,11 +1,17 @@
 Package: rUCsims
 Title: rUCsims
-Description: A package for simulating confounded datasets
+Description: A package for simulating confounded datasets and accounting for
+    unmeasured confounders
 Version: 0.1
 Maintainer: David Springate <daspringate@gmail.com>
-Authors: David A. Springate
+Author: David A. Springate
 License: GPL-3
-Depends: R (>= 3.0.2)
+Depends:
+    R (>= 3.0.2)
 Suggests:
     testthat,
-    roxygen2
+    roxygen2,
+    multicore,
+    ggplot2,
+    scales,
+    reshape2

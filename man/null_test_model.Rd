@@ -1,0 +1,10 @@
+\name{null_test_model}
+\alias{null_test_model}
+\title{For testing - all parameters set to 1}
+\usage{
+null_test_model(UCsim_obj)
+}
+\description{
+For testing - all parameters set to 1
+}
+
