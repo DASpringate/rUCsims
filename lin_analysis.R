@@ -81,17 +81,49 @@ p + geom_line() +
     scale_y_continuous("Prevalence")
 ggsave("figure/prev_test.pdf")
 
-
+run1 <- run_sims(UBs, reps = 20, cores = 20, sims_fn = lin_sim, model_fn = bin_UC_models, UC = "U1",  
+                 obs = 100000, probY_0 = 0.1, probE_0 = 0.1, probU = 0.1)
 
 # Set your parameter values here:
-run8 <- stable_run(Ubs = c(0.1, 0.5, 1, 2, 10), pY_target = 0.6, pE_target = 0.4, probE_0 = 0.5, probY_0 = 0.5, 
-                          obs_stable = 1000000, obs_run = 10000, orEY_0 = 10,
-                          probU = 0.6, modUB = 4, orME = 7, orMY_0 = 2, rho = 0, tol_Y = 0.0005, tol_E = 0.0005, cores = 1)
+run8 <- stable_run(Ubs = c(0.05, 0.1, 0.333, 0.5, 1, 2, 3, 5, 10, 20), 
+                   obs_stable = 1000000,  cores = 12, obs_run = 10000, reps = 12,
+                   tol_Y = 0.0005, tol_E = 0.0005, pY_target = 0.5, pE_target = 0.5, 
+                   probE_0 = 0.5, probY_0 = 0.5, orEY_0 = 1, probU = 0.5, 
+                   modUB = 1, orME = 2, orMY_0 = 2, rho = 0)
 
 
 molten = melt(run8$aggregates[, c("orUB", "mOReyFull", "mOReyPart", "bOReyPartAdj", "cOReyPartAdj")], id.vars = c("orUB"))
 p <- ggplot(molten, aes(x = orUB, y = value, colour = variable))
-p + geom_line() + 
+p + geom_line() + geom_point() + 
     scale_x_continuous(trans=log_trans(), breaks = c(0.1, 0.5, 2, 5, 10, 20)) + 
     scale_y_continuous("Odds ratio")
+
+
+stable_params <- lapply(overall_prev(orUB = 2, sims_fn = lin_sim, iter_fn = iter_fn_1, 
+                                     pY_target = 0.5, pE_target = 0.5, obs = 1000000, verbose = TRUE, 
+                                      probE_0 = 0.5, probY_0 = 0.5, orEY_0 = 1, probU = 0.5, 
+                                     modUB = 1, orME = 2, orMY_0 = 2, rho = 0)$parameters,
+                        function(x) x)
+stable_params$obs <- 10000
+stable_params <- stable_params[names(stable_params) %in% names(formals(lin_sim))]
+stable_params[["orUB"]] <- NULL
+
+a <- do.call(run_sims, c(stable_params, cores = 1, Ubs = 2, 
+                           sims_fn = lin_sim, model_fn = bin_UC_models, 
+                           reps = 1))
+
+sapply(stable_params, function(x)format(x, scientific=F))
+
+run1 <- run_sims(Ubs=2, reps = 1, cores = 1, sims_fn = lin_sim, model_fn = bin_UC_models, UC = "U1",  
+                 obs = 10000, probY_0 = 0.414566, probE_0 = 0.4143119, probU = 0.5)
+
+
+run2 <- do.call(run_sims, list(Ubs=2, reps = 1, cores = 1, sims_fn = lin_sim, model_fn = bin_UC_models, UC = "U1",  
+                 obs = 10000, probY_0 = 0.414566, probE_0 = 0.4143119, probU = 0.5))
+
+run3 <- run_sims(obs = 10000, probE_0 = 0.4143119, probY_0 = 0.414566, orEY_0 = 1, probU = 0.5,
+                 modUB = 1, orME = 2, rho = 0, orUBe = 2, cores = 1, Ubs=2, 
+                 sims_fn = lin_sim, model_fn = bin_UC_models)
+
+
 

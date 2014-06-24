@@ -104,14 +104,14 @@ rep_sims <- function(orUB_levels, reps = 10, cores = 1, ...){
     if(cores > 1){ # set to 1 for a windows machine.
         library(multicore)
         do.call(`rbind`, mclapply(1:reps, function(x){
-            d <- run_UC_levels(orUB_levels, ...)
+            d <- run_UC_levels(orUB_levels = orUB_levels, ...)
             d$reps <- x
             cat(".")
             d
         }, mc.cores = cores))
     } else {
         do.call(`rbind`, lapply(1:reps, function(x){
-            d <- run_UC_levels(orUB_levels, ...)
+            d <- run_UC_levels(orUB_levels = orUB_levels, ...)
             d$reps <- x
             cat(".")
             d
@@ -185,7 +185,7 @@ overall_prev <- function(sims_fn = lin_sim, iter_fn = iter_fn_1, pY_target, pE_t
 #' @param \dots arguments to be passed to sims_fn
 #' @return list containing data and aggregated data
 stable_run <- function(Ubs, pY_target, pE_target, obs_stable, obs_run, 
-                       sims_fn = lin_sim, iter_fn = iter_fn_1, cores = 1, ...){
+                       sims_fn = lin_sim, iter_fn = iter_fn_1, model_fn = bin_UC_models, cores = 1, reps = 10, ...){
     out <- do.call(`rbind`, lapply(Ubs, function(U){
         message("orU = ", U)
         message("Iterating to find stable parameters...")
@@ -194,8 +194,9 @@ stable_run <- function(Ubs, pY_target, pE_target, obs_stable, obs_run,
                                 function(x) x)
         stable_params$obs <- obs_run
         stable_params <- stable_params[names(stable_params) %in% names(formals(sims_fn))]
-        message("Running simulations with stablised parameters...")
-        do.call(`run_sims`, c(stable_params, cores = cores, Ubs = U))$data
+        stable_params[["orUB"]] <- NULL
+        message("Running simulations with stablised parameters (", reps, " reps)...")
+        do.call(`run_sims`, c(stable_params, cores = cores, Ubs = U, sims_fn = sims_fn, model_fn = model_fn, reps = reps))$data
     }))
     dat_reduced <- out[, c("orUB", "probE_0", "probY_0", "orEY_0", "probU", "mOReyFull", "mOReyPart", "bOReyPartAdj", "cOReyPartAdj")]
     list(data = out, aggregates = aggregate(dat_reduced, by = list(orUB = dat_reduced$orUB), FUN = median))
