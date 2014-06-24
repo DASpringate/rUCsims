@@ -97,26 +97,16 @@ run_UC_levels <- function(orUB_levels, sims_fn = lin_sim, model_fn = bin_UC_mode
 
 #' This is the replication function.
 #' Runs run_UC_levels over reps replicates and binds to a single dataframe
-#' Runs simulations in parallel if cores > 1 (needs to have multicore package installed)
+#' Runs simulations in parallel if cores > 1 )
 #' Set cores to 1 if running on a windows machine
 #' @export
 rep_sims <- function(orUB_levels, reps = 10, cores = 1, ...){
-    if(cores > 1){ # set to 1 for a windows machine.
-        library(multicore)
         do.call(`rbind`, mclapply(1:reps, function(x){
             d <- run_UC_levels(orUB_levels = orUB_levels, ...)
             d$reps <- x
             cat(".")
             d
         }, mc.cores = cores))
-    } else {
-        do.call(`rbind`, lapply(1:reps, function(x){
-            d <- run_UC_levels(orUB_levels = orUB_levels, ...)
-            d$reps <- x
-            cat(".")
-            d
-        }))
-    }
 }
 
 #' Helper function to automate running different conditions

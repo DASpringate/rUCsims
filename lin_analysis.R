@@ -1,24 +1,29 @@
-source("R/lin_sims.R") # you will need to change this file path.
+###########################
+### RUN THIS CODE FIRST ###
+###########################
+
+source("R/lin_sims.R") 
 
 library(ggplot2)
 library(scales)
 library(reshape2)
+library(parallel)
 if(Sys.info()['sysname'] == "Windows"){
     my_cores <- 1 
 } else {
-    library(multicore)
     my_cores <- 12    
 } 
 
 
+#############################
+### Simulate stata tables ###
+#############################
 
 # generate the simulations:
 # This code replicates the original stata tables and produces the split line graphs (lin_chart.pdf)
 
 UBs <- c(0.1, 0.333, 0.5, 2, 3, 5, 10, 20)
-
-
-run1 <- run_sims(UBs, reps = 20, cores = my_cores, sims_fn = lin_sim, model_fn = bin_UC_models, UC = "U1",  
+run1 <- run_sims(UBs, reps = 2, cores = my_cores, sims_fn = lin_sim, model_fn = bin_UC_models, UC = "U1",  
                  obs = 100000, probY_0 = 0.1, probE_0 = 0.1, probU = 0.1)
 run2 <- run_sims(UBs, reps = 100, cores = my_cores, sims_fn = lin_sim, model_fn = bin_UC_models, UC = "U1",  
                  obs = 100000, probY_0 = 0.5, probE_0 = 0.5, probU = 0.5)
@@ -51,6 +56,12 @@ p + geom_line() +
     scale_y_continuous("Odds ratio")
 
 ggsave("figure/lin_chart.pdf")
+
+
+
+##############################################################
+### Test for effect of changes in UB on overall prevalence ###
+##############################################################
 
 
 #' This code produces the graphs that test for the effect of changes in UB on overall prevelance
@@ -86,12 +97,14 @@ p + geom_line() +
     scale_y_continuous("Prevalence")
 ggsave("figure/prev_test.pdf")
 
-run1 <- run_sims(UBs, reps = 20, cores = my_cores, sims_fn = lin_sim, model_fn = bin_UC_models, UC = "U1",  
-                 obs = 100000, probY_0 = 0.1, probE_0 = 0.1, probU = 0.1)
+
+#####################################################
+### Runs with stabilised initial parameter values ###
+#####################################################
 
 # Set your parameter values here:
 run8 <- stable_run(Ubs = c(0.05, 0.1, 0.333, 0.5, 1, 2, 3, 5, 10, 20), 
-                   obs_stable = 1000000,  cores = my_cores, obs_run = 10000, reps = 12,
+                   obs_stable = 1000000,  cores = my_cores, obs_run = 10000, reps = 2,
                    tol_Y = 0.0005, tol_E = 0.0005, pY_target = 0.5, pE_target = 0.5, 
                    probE_0 = 0.5, probY_0 = 0.5, orEY_0 = 1, probU = 0.5, 
                    modUB = 1, orME = 2, orMY_0 = 2, rho = 0)
@@ -102,6 +115,7 @@ p <- ggplot(molten, aes(x = orUB, y = value, colour = variable))
 p + geom_line() + geom_point() + 
     scale_x_continuous(trans=log_trans(), breaks = c(0.1, 0.5, 2, 5, 10, 20)) + 
     scale_y_continuous("Odds ratio")
+ggsave("figure/run8_plot.pdf")
 
 
 
