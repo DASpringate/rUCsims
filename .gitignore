@@ -1,3 +1,6 @@
 *.Rproj
 testing.R
 .Rproj.user
+.dropbox
+.Rhistory
+figure/*

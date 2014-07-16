@@ -18,4 +18,5 @@
 ##'
 ##' @docType package
 ##' @name rUCsims
+##' @import parallel
 NULL

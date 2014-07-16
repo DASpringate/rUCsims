@@ -8,10 +8,11 @@ Author: David A. Springate
 License: GPL-3
 Depends:
     R (>= 3.0.2)
+Imports:
+    parallel
 Suggests:
     testthat,
     roxygen2,
-    multicore,
     ggplot2,
     scales,
     reshape2
