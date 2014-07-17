@@ -184,7 +184,7 @@ overall_prev <- function(method, iter_fn = iter_fn_1, pY_target, pE_target, prob
 #' @param \dots arguments to be passed to sims_fn
 #' @return list containing data and aggregated data
 stable_run <- function(Ubs, pY_target, pE_target, obs_stable, obs_run, method,
-                       iter_fn = iter_fn_1, adjust_fn, cores = 1, reps = 10, agg_subset = NULL, ...){
+                       iter_fn = iter_fn_1, adjust_fn, cores = 1, reps = 10, agg_subset = NULL, subgroups = NULL, ...){
     out <- do.call(`rbind`, lapply(Ubs, function(U){
         message("orU = ", U)
         message("Iterating to find stable parameters...")
@@ -195,7 +195,8 @@ stable_run <- function(Ubs, pY_target, pE_target, obs_stable, obs_run, method,
         stable_params <- stable_params[names(stable_params) %in% names(formals(simulate_UC))]
         stable_params[["orUE"]] <- NULL
         message("Running simulations with stablised parameters (", reps, " reps)...")
-        do.call(`run_sims`, c(stable_params, cores = cores, Ubs = U, method = method, adjust_fn = adjust_fn, reps = reps))$data
+        do.call(`run_sims`, c(stable_params, cores = cores, Ubs = U, method = method, 
+                              adjust_fn = adjust_fn, reps = reps, subgroups = subgroups))$data
     }))
     if(!is.null(agg_subset)){
         dat_reduced <- out[, agg_subset]

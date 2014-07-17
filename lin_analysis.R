@@ -113,8 +113,8 @@ run8 <- stable_run(Ubs = c(0.1, 0.5, 1, 2, 10),
                    obs_stable = 100000,  cores = 12, obs_run = 10000, reps = 10,
                    tol_Y = 0.005, tol_E = 0.005, pY_target = 0.5, pE_target = 0.5, 
                    probE_0 = 0.5, probY_0 = 0.5, orEY_0 = 1, probU = 0.3, 
-                   modUB = 1, orME = 1, orMY_0 = 1, rho = 0, 
-                   method = "no_continuous_confounder", adjust_fn = lin_adjust,
+                   modUB = 1, orME = 1, orMY_0 = 1, rho = 0.5, 
+                   method = "continuous_confounder", adjust_fn = lin_adjust,
                    agg_subset = c("orUE", "probE_0", "probY_0", "orEY_0", 
                                   "probU", "mOReyFull", "mOReyPart", 
                                   "bOReyPartAdj", "cOReyPartAdj"))
@@ -123,8 +123,8 @@ run9 <- stable_run(Ubs = c(0.1, 0.5, 1, 2, 10),
                    obs_stable = 100000,  cores = 12, obs_run = 10000, reps = 10,
                    tol_Y = 0.005, tol_E = 0.005, pY_target = 0.5, pE_target = 0.5, 
                    probE_0 = 0.5, probY_0 = 0.5, orEY_0 = 1, probU = 0.3, 
-                   modUB = 1, orME = 1, orMY_0 = 1, rho = 0, 
-                   method = "no_continuous_confounder", adjust_fn = r_and_r_adjust)
+                   modUB = 1, orME = 1, orMY_0 = 1, rho = 0.5, subgroups = 5,
+                   method = "continuous_confounder", adjust_fn = r_and_r_adjust)
 
 # combine data from the two:
 test_dat <- run8$aggregates
@@ -136,12 +136,13 @@ p <- ggplot(molten, aes(x = orUE, y = value, colour = variable))
 p + geom_line() + geom_point() + 
     scale_x_continuous(trans=log_trans(), breaks = c(0.1, 0.5, 2, 5, 10, 20)) + 
     scale_y_continuous("Odds ratio")
-ggsave("figure/lin_vs_rr_performance.pdf")
+ggsave("figure/lin_vs_rr_performance_with_rho0.5.pdf")
 
 
-############################################
-## R and R method - check for breakdowns ###
-############################################
+
+
+
+
 
 
 

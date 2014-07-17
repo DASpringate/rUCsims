@@ -9,7 +9,9 @@
 #' 
 r_and_r_adjust <- function(sims_obj, subgroups = 5, BC = "U1", MC = "U2"){
     if(subgroups > 1){
-        sims_obj$data$MC_strata <- cut(sims_obj$data[[MC]], breaks = subgroups, labels = FALSE)
+        sims_obj$data$MC_strata <- cut(sims_obj$data[[MC]], quantile(sims_obj$data[[MC]], 
+                                                                     seq(0, 1, len = subgroups + 1)), 
+                                       include.lowest = TRUE, labels = FALSE)
     } else sims_obj$data$MC_strata <- 1
     # sensitivity parameters
     pi_ <- 1 - sims_obj$parameters[["probU"]]
@@ -20,7 +22,7 @@ r_and_r_adjust <- function(sims_obj, subgroups = 5, BC = "U1", MC = "U2"){
     parms <- data.frame(t(sapply(1:subgroups, function(subgroup){
         dat <- sims_obj$data[ sims_obj$data$MC_strata == subgroup,]
         
-        c(nsub = nrow(dat), meanY <- mean(dat$Y), meanE = mean(dat$E), 
+        c(nsub = nrow(dat), meanY = mean(dat$Y), meanE = mean(dat$E), 
           meanE_u0 = mean(dat$E[dat[[BC]] == 0]),  meanE_u1 = mean(dat$E[dat[[BC]] == 1]),
           meanU = mean(dat[[BC]]), meanU_e0 = mean(dat[[BC]][dat$E == 0]), meanU_e1 = mean(dat[[BC]][dat$E == 1]),
           meanY = mean(dat$Y), meanY_e0 = mean(dat$Y[dat$E == 0]), meanY_e1 = mean(dat$Y[dat$E == 1]),
@@ -28,7 +30,7 @@ r_and_r_adjust <- function(sims_obj, subgroups = 5, BC = "U1", MC = "U2"){
           meanY_e0u0 = mean(dat$Y[dat$E == 0 & dat[[BC]] == 0]), meanY_e1u0 = mean(dat$Y[dat$E == 1 & dat[[BC]] == 0]),
           meanY_e0u1 = mean(dat$Y[dat$E == 0 & dat[[BC]] == 1]), meanY_e1u1 = mean(dat$Y[dat$E == 1 & dat[[BC]] == 1]))
     })))
-    parms$mean_not_E <- 1 - parms$meanE_u0
+    parms$mean_not_E <- 1 - parms$meanE_u0    # this is zero  
     a_ <- exp(alpha) * parms$mean_not_E
     b_ <- (parms$mean_not_E - pi_) * exp(alpha) + parms$mean_not_E + pi_ - 1
     c_ <- parms$mean_not_E - 1
@@ -36,7 +38,7 @@ r_and_r_adjust <- function(sims_obj, subgroups = 5, BC = "U1", MC = "U2"){
     parms$odds_not_E_0 <- parms$mean_not_E / (1 - parms$mean_not_E)
     wt0 <- pi_ / (pi_ + ((1 - pi_) * (1 + exp(parms$gamma))/(1 + exp(parms$gamma + alpha)))) # estimated adjusted prob that U=0 when E=0?
     wt1 <- pi_ / (pi_ + ((1 - pi_) * exp(alpha) * (1 + exp(parms$gamma)) / (1 + exp(parms$gamma + alpha)))) # estimated adjusted prob that u=0 when E=1?
-    parms$mean_not_Y_e0 <- 1 - parms$meanY_e0
+    parms$mean_not_Y_e0 <- 1 - parms$meanY_e0   
     aa0 <- exp(delta0) * parms$mean_not_Y_e0
     bb0 <- (parms$mean_not_Y_e0 - wt0) * exp(delta0) + parms$mean_not_Y_e0 + wt0 - 1
     cc0 <- parms$mean_not_Y_e0 - 1
@@ -72,13 +74,6 @@ r_and_r_adjust <- function(sims_obj, subgroups = 5, BC = "U1", MC = "U2"){
       OReyFull = exp(full_mod[["E"]]), OReyPart = exp(reduced_mod[["E"]]), parm_totals, OReyPartAdj = totalAdjOREY, 
       bOReydiff = totalAdjOREY - exp(full_mod[["E"]]))
 }
-
-
-
-
-
-
-
 
 
 

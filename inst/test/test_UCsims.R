@@ -44,7 +44,7 @@ run_sims(c(0.1, 0.5, 1, 2, 10), obs = 10000, probE_0 = 0.5, probY_0 = 0.5, orEY_
 a <- simulate_UC(obs = 100000, orUE = 5, probE_0 = 0.1, probY_0 = 0.2, orEY_0 = 1, probU = 0.3, 
                  modUB = 1, orME = 1, orMY_0 = 1, rho = 0.0, orUY_0 = 5, method = "no")
 
-aa <- rep_sims(orUE_levels= c(0.1, 0.5, 1, 2, 10), 
+aa <- rep_sims(orUE_levels= c(0.1, 0.5, 1, 2, 10, 20), 
                cores = 1, obs = 10000, reps = 10,
                probE_0 = 0.5, probY_0 = 0.5, orEY_0 = 1, probU = 0.3, 
                modUB = 1, orME = 1, orMY_0 = 1, rho = 0, 
